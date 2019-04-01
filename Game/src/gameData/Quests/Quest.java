@@ -6,23 +6,22 @@ import gameData.Skills.Skill;
 public abstract class Quest {
 	public static ArrayList<Quest> quests = new ArrayList<Quest>();
 	protected String name, desc;
+	protected final int MAX_PHASE;
 	private int phase;
-	private final int MAX_PHASE;
-	private ArrayList<Skill> reqs;
-	private ArrayList<Skill> rewards;
+	private ArrayList<Skill> reqs, rewards;
 
-	public Quest(int maxPhase) {
+	public Quest() {
 		Quest.quests.add(this);
-		this.desc = setDesc(this.getPhase());
-		this.reqs = setReqs();
-		this.rewards = setRewards();
+		this.desc = this.setDesc(this.getPhase());
+		this.reqs = this.setReqs();
+		this.rewards = this.setRewards();
+		this.MAX_PHASE = this.setMaxPhase();
 		this.phase = 0;
-		this.MAX_PHASE = maxPhase;
 	}
 
-	/*******************
-	 * ACCESSOR METHODS
-	 *******************/
+	// ****************
+	// ACCESSOR METHODS
+	// ****************
 	public String getName() {
 		return this.name;
 	}
@@ -39,60 +38,68 @@ public abstract class Quest {
 		return (ArrayList<Skill>) this.rewards;
 	}
 
+	public int getMaxPhase() {
+		return this.MAX_PHASE;
+	}
+
 	public int getPhase() {
 		return this.phase;
 	}
 
-	public boolean isComplete() {
-		return this.phase == this.MAX_PHASE;
+	// ****************
+	// MUTATOR METHODS
+	// ****************
+
+	protected abstract String setDesc(int temp);
+
+	protected abstract ArrayList<Skill> setReqs();
+
+	protected abstract ArrayList<Skill> setRewards();
+
+	protected abstract int setMaxPhase();
+
+	// **************
+	// MISC. METHODS
+	// **************
+
+	// Formats quest requirements
+	public String printReqs() {
+		String str = "";
+
+		for (Skill skill : this.reqs)
+			str += "\n - Level " + skill.getLvl() + " " + skill.getName();
+
+		return "Requirements:" + str;
 	}
 
-	/*******************
-	 * MUTATOR METHODS
-	 *******************/
-	public abstract String setDesc(int temp);
+	// Formats quest rewards
+	public String printRewards() {
+		String str = "";
 
-	public abstract ArrayList<Skill> setReqs();
+		for (Skill skill : this.rewards)
+			str += "\n- " + skill.getXp() + " " + skill.getName() + " XP";
 
-	public abstract ArrayList<Skill> setRewards();
+		return "Rewards:" + str;
+	}
 
-	/*******************
-	 * MISCELLANEOUS METHODS
-	 *******************/
-	public String status() {
-		if (this.phase == 0)
-			return "";
-		else if (this.phase > 0 && this.phase < this.MAX_PHASE)
-			return "~";
-		else
-			return "V";
+	public int progress() {
+		if (this.phase == this.MAX_PHASE)
+			return 100;
+		return (int) (((double) this.phase / this.MAX_PHASE) * 100);
 	}
 
 	public void nextPhase() {
-		this.phase++;
-		this.desc = setDesc(this.phase);
+		if (this.phase != this.MAX_PHASE) {
+			this.phase++;
+			this.desc = setDesc(this.phase);
+		}
 	}
 
 	public String toString() {
-		ArrayList<Skill> tempReqs = this.getReqs(), tempRewards = this.getRewards();
-		String outReqs = "", outRewards = "";
-
-		// Gets quest requirements
-		for (Skill questSkill : tempReqs) {
-			outReqs += " - Level " + questSkill.getLvl() + " " + questSkill.getName();
-		}
-
-		// Gets quest rewards
-		for (Skill questSkill : tempRewards) {
-			outRewards += " - " + questSkill.getXp() + " " + questSkill.getName() + " XP";
-		}
-
-		return "<=-=-= " + this.getName() + " =-=-=>"
-		+ "\n" + this.getDesc()
-		+ "\n\nRequirements to Start " + this.getName()
-		+ "\n" + outReqs
-		+ "\n\nRewards Upon Completion of " + this.getName()
-		+ "\n" + outRewards + "\n";
+		return "<=-= " + this.name.toUpperCase() + " (" + this.progress() + "%)" + " =-=>"
+				+ "\n" + this.desc
+				+ "\n\n" + this.printReqs()
+				+ "\n" + this.printRewards();
 	}
 
 }

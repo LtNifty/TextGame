@@ -115,12 +115,15 @@ public class Skill {
 	}
 
 	public void setLvl(int num) {
+		this.xp = this.lvlToXp(num);
 		this.lvl = num;
+		this.curLvl = num;
 	}
 
 	// **************
 	// MISC. METHODS
 	// **************
+	
 	public String buffStatus() {
 		if (this.buff == true)
 			return " ~";

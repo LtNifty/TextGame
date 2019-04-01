@@ -4,9 +4,6 @@ public class Item {
 	
 	protected String name, desc;
 	
-	public Item() {
-	}
-	
 	public String getName() {
 		return this.name;
 	}

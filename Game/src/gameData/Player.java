@@ -14,7 +14,6 @@ public class Player {
 	private String race, name, majCareer, minCareer;
 
 	public Player(String name_, String race_, String majCareer_, String minCareer_) {
-
 		this.name = name_;
 		this.race = race_;
 		this.majCareer = majCareer_;
@@ -194,360 +193,115 @@ public class Player {
 
 	}
 
-	// Returns an auto-formatted list of skills
+	// Returns an formatted list of skills
 	public String printSkills(int num) {
 		String str = "";
+		this.organizeSkills(num);
 
-		for (Skill skill : this.organizeSkills(num))
+		for (Skill skill : Player.skills)
 			if (skill.getName().equals("HP") == false)
 				str += "\n" + skill.printSkill() + skill.buffStatus();
 
 		return "<=-=-= " + this.name + "\'s Data =-=-=>" + "\n" + Player.findSkill("HP").printSkill()
 				+ "\n\nSkills\n------------------" + str + "\n";
-
 	}
 
 	// Helper organizer method for printSkills()
-	private ArrayList<Skill> organizeSkills(int num) {
-		ArrayList<Skill> arr = new ArrayList<Skill>();
-		Skill temp = null;
-		int xp;
-		String name;
-
-		Comparator<Skill> xpComparator = new Comparator<Skill>() {
-
-			public int compare(Skill s1, Skill s2) {
-				return s1.getXp() - s2.getXp();
-			}
-		};
+	// Organizes Player.skills (Default: Lowest XP First)
+	private void organizeSkills(int num) {
+		Comparator<Skill> byXp = Comparator.comparingInt(Skill::getXp);
+		Comparator<Skill> byName = Comparator.comparing(Skill::getName);
 
 		switch (num) {
 		default:
-			return Player.skills;
-
-		case 2: // Increasing XP (highest XP is first)
-			Collections.sort(Player.skills, xpComparator);
-			return Player.skills;
-
-		case 3: // Decreasing XP (lowest XP is first)
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MAX_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() < xp && arr.contains(skill) == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
+		case 1: // Standard list order
+			break;
+		case 2: // Lowest XP First
+			Collections.sort(Player.skills, byXp);
+			break;
+		case 3: // Highest XP First
+			Collections.sort(Player.skills, byXp);
+			Collections.reverse(Player.skills);
+			break;
 		case 4: // Alphabetically
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "z";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) < 0 && arr.contains(skill) == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
+			Collections.sort(Player.skills, byName);
+			break;
 		case 5: // Reverse-alphabetically
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "a";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) > 0 && arr.contains(skill) == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 6: // Buffs First - Increasing XP
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MIN_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() > xp && arr.contains(skill) == false && skill.hasBuff()) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MIN_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() > xp && arr.contains(skill) == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 7: // Buffs First - Decreasing XP
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MAX_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() < xp && arr.contains(skill) == false && skill.hasBuff()) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MAX_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() < xp && arr.contains(skill) == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 8: // Buffs First: Alphabetically
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "z";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) < 0 && arr.contains(skill) == false && skill.hasBuff()) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "z";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) < 0 && arr.contains(skill) == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 9: // Buffs First: Reverse-alphabetically
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "a";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) > 0 && arr.contains(skill) == false && skill.hasBuff()) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "a";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) > 0 && arr.contains(skill) == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 10: //Buffs First: Increasing XP
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MIN_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() > xp && arr.contains(skill) == false && skill.hasBuff() == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MIN_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() > xp && arr.contains(skill) == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 11: // Buffs last - Decreasing XP
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MAX_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() < xp && arr.contains(skill) == false && skill.hasBuff() == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			for (int i = 0; i < Player.skills.size(); i++) {
-				xp = Integer.MAX_VALUE;
-				for (Skill skill : Player.skills) {
-					if (skill.getXp() < xp && arr.contains(skill) == false) {
-						xp = skill.getXp();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-
-			return arr;
-
-
-		case 12: // Buffs last - Alphabetically
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "z";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) < 0 && arr.contains(skill) == false && skill.hasBuff() == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "z";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) < 0 && arr.contains(skill) == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
-
-		case 13: // Buffs last - Reverse-alphabetically
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "a";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) > 0 && arr.contains(skill) == false && skill.hasBuff() == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-
-			for (int i = 0; i < Player.skills.size(); i++) {
-				name = "a";
-				for (Skill skill : Player.skills) {
-					if (skill.getName().compareToIgnoreCase(name) > 0 && arr.contains(skill) == false) {
-						name = skill.getName();
-						temp = skill;
-					}
-				}
-				arr.add(temp);
-			}
-			return arr;
+			Collections.sort(Player.skills, byName);
+			Collections.reverse(Player.skills);
+			break;
 		}
 	}
 
-	// "Universal" method that grabs a skill based off name
+	// "Universal" method that finds a skill based off name
 	public static Skill findSkill(String str) {
 		Skill temp = null;
-
+		
 		for (Skill skill : skills)
 			if (skill.getName().equals(str))
 				temp = skill;
-
+		
 		return temp;
 	}
 
 	// **************
 	// QUEST METHODS
 	// **************
-
+	
+	public boolean isReady(Quest q) {
+		for (Skill s1 : q.getReqs())
+			if (Player.findSkill(s1.getName()).getLvl() < s1.getLvl())
+				return false;
+		return true;
+	}
+	
 	// Prints a list of ALL quests
 	public String printQuests(int num) {
 		String str = "";
-		ArrayList<Quest> arr = this.organizeQuests(num);
+		this.organizeQuests(num);
 
-		for (Quest temp : arr) {
-			str += temp.getName() + temp.status();
-		}
+		for (Quest q : Quest.quests)
+			str += "- " + q.getName() +  "\t" + q.progress() + "%";
 
-		return "Quests"
-		+ "\n------------------"
-		+ "\n" + str + "\n";
+		return str;
 	}
 
-	// Prints info about one quest
-	public String printQuest(String str) {
-		return Player.findQuest(str).toString();
+	// Helper organizer method for printQuests()
+	// Organizes Quest.quests (Default: Highest progress first)
+	private void organizeQuests(int num) {
+		Comparator<Quest> byProgress = Comparator.comparing(Quest::progress);
+		Comparator<Quest> byName = Comparator.comparing(Quest::getName);
+
+		switch (num) {
+		default:
+		case 1: // Highest progress first
+			Collections.sort(Quest.quests, byProgress);
+			break;
+		case 2: // Lowest progress first
+			Collections.sort(Quest.quests, byProgress);
+			Collections.reverse(Quest.quests);
+			break;
+		case 3: // Alphabetically
+			Collections.sort(Quest.quests, byName);
+			break;
+		case 4: // Reverse-alphabetically
+			Collections.sort(Quest.quests, byName);
+			Collections.reverse(Quest.quests);
+			break;
+		case 5:
+			break;
+		}
 	}
 
 	// Adds XP to main skill list from quest skill rewards list
 	public void addQuestStats(Quest quest) {
-		for (Skill skill : quest.getRewards())
-			Player.findSkill(skill.getName()).addXp(skill.getXp());
+		for (Skill s : quest.getRewards()) {
+			Player.findSkill(s.getName()).addXp(s.getXp());
+			System.out.println(s.getName() + " increased by " + s.getXp() + " XP!");
+		}
 	}
 
-	// Helper organizer method for printQuests()
-	private ArrayList<Quest> organizeQuests(int num) {
-		ArrayList<Quest> arr = new ArrayList<Quest>();
-		String name;
-		Quest temp = null;
-
-		Comparator<Quest> phaseComparator = new Comparator<Quest>() {
-
-			public int compare(Quest q1, Quest q2) {
-				return q1.getPhase() - q2.getPhase();
-			}
-		};
-
-		// ONGOING QUESTS
-		for (int i = 0; i < Quest.quests.size(); i++) {
-			name = "z";
-			for (Quest quest : Quest.quests) {
-				if (quest.getName().compareToIgnoreCase(name) < 0 && arr.contains(quest) == false && quest.getPhase() > 0 && quest.isComplete() == false) {
-					name = quest.getName();
-					temp = quest;
-				}
-			}
-			arr.add(temp);
-		}
-		// INCOMPLETE QUESTS
-		for (int i = 0; i < Quest.quests.size(); i++) {
-			name = "z";
-			for (Quest quest : Quest.quests) {
-				if (quest.getName().compareToIgnoreCase(name) < 0 && arr.contains(quest) == false && quest.getPhase() == 0) {
-					name = quest.getName();
-					temp = quest;
-				}
-			}
-			arr.add(temp);
-		}
-		// COMPLETE QUESTS
-		for (int i = 0; i < Quest.quests.size(); i++) {
-			name = "z";
-			for (Quest quest : Quest.quests) {
-				if (quest.getName().compareToIgnoreCase(name) < 0 && arr.contains(quest) == false && quest.isComplete()) {
-					name = quest.getName();
-					temp = quest;
-				}
-			}
-			arr.add(temp);
-		}
-		return arr;
-	}
-
-	// "Universal" method that grabs a quest based off name
+	// "Universal" method that finds a quest based off name
 	public static Quest findQuest(String name) {
 		Quest temp = null;
 
@@ -562,10 +316,12 @@ public class Player {
 	// COMBAT METHODS
 	// **************
 
+	// ???
 	public int getDmgInstance(Weapon wep) {
 		return 6;
 	}
 
+	// Consumes a potion; see potion consume methods for info
 	public String consume(Potion pot) {
 		pot.consume();
 		return pot.getName() + " has " + pot.getCurrDose() + " out of " + pot.getDoses() + " doses remaining.";
@@ -575,7 +331,21 @@ public class Player {
 	// INVENTORY METHODS
 	// **************
 
-	public static Item getItem(String str) {
+	// Adds items to Player.inv in quantities
+	public void addQ(Item item, int quantity) {
+		for (int i = 0; i < quantity; i++) {
+			Player.inv.add(item);
+		}
+	}
+
+	// Creates the standard player inventory
+	public void setGameInv() {
+		Player.inv = new ArrayList<Item>();
+		this.addQ(new TinyHPPotion(), 3);
+	}
+
+	// "Universal" method that finds an item based off name
+	public static Item findItem(String str) {
 		Item temp = null;
 
 		for (Item item : Player.inv)
@@ -583,16 +353,5 @@ public class Player {
 				temp = item;
 
 		return temp;
-	}
-
-	public void addQ(Item item, int quantity) {
-		for (int i = 0; i < quantity; i++) {
-			Player.inv.add(item);
-		}
-	}
-
-	public void setGameInv() {
-		Player.inv = new ArrayList<Item>();
-		this.addQ(new TinyHPPotion(), 3);
 	}
 }
